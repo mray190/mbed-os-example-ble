@@ -1,5 +1,9 @@
 {
     "target_overrides": {
+        "*": {
+            "platform.stdio-baud-rate": 9600,
+            "platform.stdio-convert-newlines": true
+        },
         "K64F": {
             "target.features_add": ["BLE"],
             "target.extra_labels_add": ["CORDIO", "CORDIO_BLUENRG"]
