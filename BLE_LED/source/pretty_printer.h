@@ -77,7 +77,7 @@ inline void print_mac_address()
     Gap::AddressType_t addr_type;
     Gap::Address_t address;
     BLE::Instance().gap().getAddress(&addr_type, address);
-    printf("DEVICE MAC ADDRESS: ");
+    printf("My MAC Address: ");
     print_address(address);
 }
 

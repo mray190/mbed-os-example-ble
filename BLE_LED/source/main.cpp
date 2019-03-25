@@ -51,7 +51,7 @@ void update_led_characteristic(void) {
 }
 
 void characteristic_discovery(const DiscoveredCharacteristic *characteristicP) {
-    printf("  C UUID-%x valueAttr[%u] props[%x]\r\n", characteristicP->getUUID().getShortUUID(), characteristicP->getValueHandle(), (uint8_t)characteristicP->getProperties().broadcast());
+    //printf("  C UUID-%x valueAttr[%u] props[%x]\r\n", characteristicP->getUUID().getShortUUID(), characteristicP->getValueHandle(), (uint8_t)characteristicP->getProperties().broadcast());
     if (characteristicP->getUUID().getShortUUID() == 0xa001) { /* !ALERT! Alter this filter to suit your device. */
         led_characteristic        = *characteristicP;
         trigger_led_characteristic = true;
@@ -59,7 +59,6 @@ void characteristic_discovery(const DiscoveredCharacteristic *characteristicP) {
 }
 
 void discovery_termination(Gap::Handle_t connectionHandle) {
-    printf("terminated SD for handle %u\r\n", connectionHandle);
     if (trigger_led_characteristic) {
         trigger_led_characteristic = false;
         event_queue.call(update_led_characteristic);
@@ -169,7 +168,7 @@ public:
         }
 
         /* Start advertising */
-        printf("Starting advertisement\r\n");
+        printf("Starting advertisement of my MAC Address.\r\n");
         error = _ble.gap().startAdvertising(ble::LEGACY_ADVERTISING_HANDLE);
 
         if (error) {
@@ -192,7 +191,6 @@ public:
 
     /** Callback triggered when the ble initialization process has finished */
     void on_init_complete(BLE::InitializationCompleteCallbackContext *params) {
-        printf("Init complete\r\n");
         if (params->error != BLE_ERROR_NONE) {
             printf("Ble initialization failed.");
             return;
@@ -205,10 +203,8 @@ public:
         _ble.gattServer().onDataWritten(this, &LEDDemo::on_data_written);
         _ble.gattClient().onDataRead(trigger_toggled_write);
 
-        printf("Setting scan parameters\r\n");
         ble::ScanParameters scan_params;
         _ble.gap().setScanParameters(scan_params);
-        printf("Finished init code\r\n");
 
         start();
     }
@@ -241,7 +237,7 @@ public:
                 field.value.size() == strlen(DEVICE_NAME) &&
                 (memcmp(field.value.data(), DEVICE_NAME, field.value.size()) == 0)) {
 
-                printf("Adv from: ");
+                printf("Saw an advertised MAC address: ");
                 printf("%02x:%02x:%02x:%02x:%02x:%02x\r\n",
                        event.getPeerAddress().data()[5],
                        event.getPeerAddress().data()[4],
@@ -249,8 +245,6 @@ public:
                        event.getPeerAddress().data()[2],
                        event.getPeerAddress().data()[1],
                        event.getPeerAddress().data()[0]);
-                printf(" rssi: %d, scan response: %u, connectable: %u\r\n",
-                       event.getRssi(), event.getType().scan_response(), event.getType().connectable());
 
                 ble_error_t error = _ble.gap().stopScan();
 
